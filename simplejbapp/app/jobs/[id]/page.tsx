@@ -221,16 +221,16 @@ export default async function JobPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header with Stats */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-4">
+          <div className="p-4">
+            <div className="flex justify-between items-start mb-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">
                   {job.title}
                 </h1>
-                <div className="mt-2 flex items-center gap-4">
+                <div className="mt-1 flex items-center gap-3">
                   <Badge variant="default">{job.type}</Badge>
                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     {job.location}
@@ -240,71 +240,70 @@ export default async function JobPage({ params }: Props) {
                   </span>
                 </div>
               </div>
-              <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+              <button className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
                 Edit Job
               </button>
             </div>
 
-            <div className="grid grid-cols-6 gap-4">
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <div className="text-2xl font-semibold text-gray-900 dark:text-white">
-                  {job.applicants.length}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-md p-3">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Applications</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">24</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">8</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">In Progress</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-green-600 dark:text-green-400">3</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">New Today</div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Total</div>
               </div>
-              <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <div className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
-                  {job.applicants.filter(a => a.status === 'new').length}
+
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-md p-3">
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Performance</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">1.2k</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Views</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">15</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Days Active</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">8</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Similar Jobs</div>
+                  </div>
                 </div>
-                <div className="text-sm text-blue-600 dark:text-blue-300">New</div>
-              </div>
-              <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                <div className="text-2xl font-semibold text-yellow-700 dark:text-yellow-400">
-                  {job.applicants.filter(a => a.status === 'reviewed').length}
-                </div>
-                <div className="text-sm text-yellow-600 dark:text-yellow-300">Reviewed</div>
-              </div>
-              <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                <div className="text-2xl font-semibold text-purple-700 dark:text-purple-400">
-                  {job.applicants.filter(a => a.status === 'interviewed').length}
-                </div>
-                <div className="text-sm text-purple-600 dark:text-purple-300">Interviewed</div>
-              </div>
-              <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <div className="text-2xl font-semibold text-green-700 dark:text-green-400">
-                  {job.applicants.filter(a => a.status === 'accepted').length}
-                </div>
-                <div className="text-sm text-green-600 dark:text-green-300">Accepted</div>
-              </div>
-              <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                <div className="text-2xl font-semibold text-red-700 dark:text-red-400">
-                  {job.applicants.filter(a => a.status === 'rejected').length}
-                </div>
-                <div className="text-sm text-red-600 dark:text-red-300">Rejected</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex gap-4">
           {/* Left Column - Job Details */}
           <div className="w-1/3">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-              <div className="p-6 space-y-6">
+              <div className="p-4 space-y-4">
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
                     Job Description
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {job.description}
                   </p>
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
                     Requirements
                   </h2>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                  <ul className="text-sm list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
                     {job.requirements.map((req, index) => (
                       <li key={index}>{req}</li>
                     ))}
@@ -312,10 +311,10 @@ export default async function JobPage({ params }: Props) {
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
                     Benefits
                   </h2>
-                  <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                  <ul className="text-sm list-disc list-inside space-y-1 text-gray-600 dark:text-gray-400">
                     {job.benefits.map((benefit, index) => (
                       <li key={index}>{benefit}</li>
                     ))}
@@ -328,7 +327,7 @@ export default async function JobPage({ params }: Props) {
           {/* Right Column - Applicants */}
           <div className="w-2/3">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-              <div className="p-6">
+              <div className="p-4">
                 <ApplicantList applicants={job.applicants} />
               </div>
             </div>

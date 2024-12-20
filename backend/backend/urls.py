@@ -16,7 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from rest_framework import routers
+from . import views
+
+router = routers.DefaultRouter()
+router.register(r'jobs', views.JobViewSet, basename='job')
+router.register(r'applications', views.ApplicationViewSet, basename='application')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-]
+    path('api/stats/', views.dashboard_stats, name='dashboard-stats'),
+] + router.urls
