@@ -37,16 +37,22 @@ class JobSerializer(serializers.ModelSerializer):
         }
 
 class ApplicationSerializer(serializers.ModelSerializer):
-    applicant_name = serializers.CharField(source='applicant.get_full_name', read_only=True)
-    job_title = serializers.CharField(source='job.title', read_only=True)
+    applicant = serializers.SerializerMethodField()
+    job = JobSerializer()
 
     class Meta:
         model = Application
         fields = (
-            'id', 'job', 'job_title', 'applicant', 'applicant_name',
-            'status', 'skills', 'match_score', 'applied_date', 'updated_at'
+            'id', 'job', 'applicant', 'status', 'match_score', 
+            'applied_date', 'updated_at'
         )
-        read_only_fields = ('match_score', 'applied_date', 'updated_at')
+
+    def get_applicant(self, obj):
+        return {
+            'first_name': obj.applicant.first_name,
+            'last_name': obj.applicant.last_name,
+            'email': obj.applicant.email
+        }
 
 class UserProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(source='user.get_full_name', read_only=True)

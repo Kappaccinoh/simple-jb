@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -13,14 +13,12 @@ from .serializers import (
 class CompanyViewSet(viewsets.ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'location']
 
 class JobViewSet(viewsets.ModelViewSet):
     queryset = Job.objects.all()
     serializer_class = JobSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'company__name', 'location', 'type']
 
@@ -47,22 +45,15 @@ class JobViewSet(viewsets.ModelViewSet):
         return Response(ApplicationSerializer(application).data)
 
 class ApplicationViewSet(viewsets.ModelViewSet):
+    queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        user = self.request.user
-        return Application.objects.all()
+        return Application.objects.all().select_related('job', 'applicant')
             
 class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_staff:
-            return UserProfile.objects.all()
-        return UserProfile.objects.filter(user=user)
 
     @action(detail=False, methods=['get'])
     def me(self, request):
@@ -73,7 +64,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 class JobViewViewSet(viewsets.ModelViewSet):
     queryset = JobView.objects.all()
     serializer_class = JobViewSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(

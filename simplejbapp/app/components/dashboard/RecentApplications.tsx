@@ -106,7 +106,7 @@ export function RecentApplications() {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-medium dark:text-white">
-                    {application.applicant.first_name}
+                    {`${application.applicant.first_name} ${application.applicant.last_name}`}
                   </h3>
                   {application.match_score >= 90 && (
                     <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-900 dark:text-green-300">
