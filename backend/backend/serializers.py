@@ -44,9 +44,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         model = Application
         fields = (
             'id', 'job', 'job_title', 'applicant', 'applicant_name',
-            'status', 'experience', 'current_role', 'current_company',
-            'skills', 'portfolio_url', 'github_url', 'linkedin_url',
-            'match_score', 'applied_date', 'updated_at'
+            'status', 'skills', 'match_score', 'applied_date', 'updated_at'
         )
         read_only_fields = ('match_score', 'applied_date', 'updated_at')
 
@@ -72,19 +70,15 @@ class JobViewSerializer(serializers.ModelSerializer):
 
 # Nested serializers for detailed views
 class JobDetailSerializer(JobSerializer):
-    applications = serializers.SerializerMethodField()
+    applications = ApplicationSerializer(many=True, read_only=True)
     company = CompanySerializer(read_only=True)
 
     class Meta(JobSerializer.Meta):
         fields = JobSerializer.Meta.fields + ('applications',)
-
-    def get_applications(self, obj):
-        applications = obj.applications.all()
-        return ApplicationSerializer(applications, many=True).data
 
 class ApplicationDetailSerializer(ApplicationSerializer):
     job = JobSerializer(read_only=True)
     applicant = UserSerializer(read_only=True)
 
     class Meta(ApplicationSerializer.Meta):
-        fields = ApplicationSerializer.Meta.fields + ('job', 'applicant') 
+        fields = ApplicationSerializer.Meta.fields + ('job', 'applicant')
