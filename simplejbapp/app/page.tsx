@@ -1,7 +1,7 @@
-import { JobPostingStats } from "./components/dashboard/JobPostingStats";
-import { RecentApplications } from "./components/dashboard/RecentApplications";
-import { ActiveJobListings } from "./components/dashboard/ActiveJobListings";
-import { Navbar } from "./components/navigation/Navbar";
+import { JobPostingStats } from "@/app/components/dashboard/JobPostingStats";
+import { RecentApplications } from "@/app/components/dashboard/RecentApplications";
+import { ActiveJobListings } from "@/app/components/dashboard/ActiveJobListings";
+import { Navbar } from "@/app/components/navigation/Navbar";
 
 export default async function Page() {
   return (
