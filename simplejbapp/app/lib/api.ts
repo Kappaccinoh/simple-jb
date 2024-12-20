@@ -8,13 +8,19 @@ export async function fetchDashboardStats() {
 
 export async function fetchJobs() {
     const response = await fetch(`${API_BASE_URL}/jobs/`);
-    if (!response.ok) throw new Error('Failed to fetch jobs');
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || 'Failed to fetch jobs');
+    }
     return response.json();
 }
 
 export async function fetchJobDetails(id: string) {
     const response = await fetch(`${API_BASE_URL}/jobs/${id}/`);
-    if (!response.ok) throw new Error('Failed to fetch job details');
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || 'Failed to fetch job details');
+    }
     return response.json();
 }
 
