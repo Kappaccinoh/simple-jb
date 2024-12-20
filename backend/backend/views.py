@@ -2,8 +2,34 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from .models import Job
+from .serializers import JobSerializer
 
-class JobViewSet(viewsets.ViewSet):
+class JobViewSet(viewsets.ModelViewSet):
+    queryset = Job.objects.all()
+    serializer_class = JobSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            # Print request data for debugging
+            print("Received data:", request.data)
+            
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                job = serializer.save()
+                return Response(
+                    JobSerializer(job).data,
+                    status=status.HTTP_201_CREATED
+                )
+            print("Validation errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print("Error creating job:", str(e))
+            return Response(
+                {"error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     def list(self, request):
         # Mock data for now
         jobs = [

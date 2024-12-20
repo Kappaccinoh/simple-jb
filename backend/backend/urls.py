@@ -15,15 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from rest_framework import routers
 from . import views
 
+# Create a router and register our viewsets with it
 router = routers.DefaultRouter()
 router.register(r'jobs', views.JobViewSet, basename='job')
 router.register(r'applications', views.ApplicationViewSet, basename='application')
 
+# The API URLs are determined automatically by the router
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),  # Mount the router URLs under /api/
     path('api/stats/', views.dashboard_stats, name='dashboard-stats'),
-] + router.urls
+]
