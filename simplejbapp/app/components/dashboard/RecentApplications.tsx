@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 interface Application {
   id: number;
@@ -57,9 +58,6 @@ export function RecentApplications() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Recent Applications
           </h2>
-          <button className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-            View all
-          </button>
         </div>
         
         <div className="space-y-4">
@@ -105,9 +103,12 @@ export function RecentApplications() {
       </div>
       
       <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
-        <button className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-          Export applications →
-        </button>
+        <Link 
+          href="/applications"
+          className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+        >
+          View all applications →
+        </Link>
       </div>
     </div>
   );
