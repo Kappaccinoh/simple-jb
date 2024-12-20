@@ -2,6 +2,7 @@ import { JobPostingStats } from "@/app/components/dashboard/JobPostingStats";
 import { RecentApplications } from "@/app/components/dashboard/RecentApplications";
 import { ActiveJobListings } from "@/app/components/dashboard/ActiveJobListings";
 import { Navbar } from "@/app/components/navigation/Navbar";
+import Link from 'next/link';
 
 export default async function Page() {
   return (
@@ -12,9 +13,12 @@ export default async function Page() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Employer Dashboard
           </h1>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+          <Link
+            href="/jobs/new"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
             Post New Job
-          </button>
+          </Link>
         </div>
 
         <JobPostingStats />
