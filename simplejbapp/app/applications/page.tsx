@@ -4,30 +4,16 @@ import { useEffect, useState } from 'react';
 import { Navbar } from "@/app/components/navigation/Navbar";
 import { Badge } from "@/app/components/ui/Badge";
 import Link from "next/link";
-import { fetchApplications } from '@/app/lib/api';
+import { fetchApplications, fetchUserProfile, fetchJobDetails } from '@/app/lib/api';
+import { Application, UserProfile, Job } from '@/app/types/index';
 
-interface Application {
-  id: number;
-  job: {
-    id: number;
-    title: string;
-    type: string;
-    company_name: string;
-  };
-  applicant: {
-    first_name: string;
-    last_name: string;
-    email: string;
-    current_role: string;
-    current_company: string;
-  };
-  status: 'new' | 'reviewed' | 'interviewed' | 'rejected' | 'accepted';
-  match_score: number;
-  applied_date: string;
+interface ApplicationWithDetails extends Application {
+  profile?: UserProfile;
+  jobDetails?: Job;
 }
 
 export default function ApplicationsPage() {
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<ApplicationWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +21,24 @@ export default function ApplicationsPage() {
     async function loadApplications() {
       try {
         const data = await fetchApplications();
-        setApplications(data);
+        
+        // Fetch user profiles and job details for each application
+        const applicationsWithDetails = await Promise.all(
+          data.map(async (application) => {
+            try {
+              const [profile, jobDetails] = await Promise.all([
+                fetchUserProfile(application.applicant),
+                fetchJobDetails(application.job.toString())
+              ]);
+              return { ...application, profile, jobDetails };
+            } catch (err) {
+              console.error(`Failed to fetch details for application ${application.id}`, err);
+              return application;
+            }
+          })
+        );
+
+        setApplications(applicationsWithDetails);
       } catch (err) {
         setError('Failed to load applications');
         console.error(err);
@@ -46,6 +49,7 @@ export default function ApplicationsPage() {
 
     loadApplications();
   }, []);
+
 
   const getStatusBadge = (status: Application['status']) => {
     const variants = {
@@ -116,14 +120,14 @@ export default function ApplicationsPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-col">
                         <Link 
-                          href={`/jobs/${application.job.id}`}
+                          href={`/jobs/${application.jobDetails?.id}`}
                           className="text-base font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate"
                         >
-                          {application.job.title}
+                          {application.jobDetails?.title}
                         </Link>
                         
                         <div className="mt-2 flex items-center gap-3">
-                          <Badge variant="default">{application.job.type}</Badge>
+                          <Badge variant="default">{application.jobDetails?.type}</Badge>
                           <span className="text-sm text-gray-500 dark:text-gray-400">
                             Applied {new Date(application.applied_date).toLocaleDateString()}
                           </span>
@@ -139,10 +143,10 @@ export default function ApplicationsPage() {
                         <div className="flex items-center gap-4">
                           <div className="min-w-0">
                             <div className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
-                              {application.applicant.first_name} {application.applicant.last_name}
+                              {application.profile?.full_name}
                             </div>
                             <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                              {application.applicant.email}
+                              {application.profile?.email}
                             </div>
                           </div>
                           {getStatusBadge(application.status)}

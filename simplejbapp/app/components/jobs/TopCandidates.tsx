@@ -2,11 +2,19 @@
 
 import { Badge } from "@/app/components/ui/Badge";
 import Link from 'next/link';
-import { Application } from '@/app/types';
+import { Application, UserProfile } from '@/app/types/index';
+
+interface ApplicationWithProfile extends Application {
+  profile?: UserProfile;
+}
 
 interface TopCandidateProps {
-  applicant: Application;
+  applicant: ApplicationWithProfile;
   aiRecommendation: string;
+}
+
+interface TopCandidatesProps {
+  applicants: ApplicationWithProfile[];  // And this line
 }
 
 function TopCandidate({ applicant, aiRecommendation }: TopCandidateProps) {
@@ -16,7 +24,7 @@ function TopCandidate({ applicant, aiRecommendation }: TopCandidateProps) {
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h3 className="text-base font-medium text-gray-900 dark:text-white">
-              {applicant.applicant.first_name} {applicant.applicant.last_name}
+              {applicant.profile?.full_name}
             </h3>
             <Badge variant="success">
               Match Score {applicant.match_score}%
@@ -26,7 +34,7 @@ function TopCandidate({ applicant, aiRecommendation }: TopCandidateProps) {
 
           <div className="mt-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {applicant.applicant.current_role} at {applicant.applicant.current_company} • {applicant.applicant.experience_years} years exp.
+              {applicant.profile?.current_role} at {applicant.profile?.current_company} • {applicant.profile?.experience_years} years exp.
             </p>
           </div>
 
@@ -35,18 +43,18 @@ function TopCandidate({ applicant, aiRecommendation }: TopCandidateProps) {
           </div>
 
           <div className="mt-3 flex gap-3">
-            {applicant.applicant.portfolio_url && (
+            {applicant.profile?.portfolio_url && (
               <Link 
-                href={applicant.applicant.portfolio_url}
+                href={applicant.profile?.portfolio_url}
                 className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
                 target="_blank"
               >
                 View Portfolio ↗
               </Link>
             )}
-            {applicant.applicant.github_url && (
+            {applicant.profile?.github_url && (
               <Link 
-                href={applicant.applicant.github_url}
+                href={applicant.profile?.github_url}
                 className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
                 target="_blank"
               >
@@ -62,10 +70,6 @@ function TopCandidate({ applicant, aiRecommendation }: TopCandidateProps) {
       </div>
     </div>
   );
-}
-
-interface TopCandidatesProps {
-  applicants: Application[];
 }
 
 export function TopCandidates({ applicants }: TopCandidatesProps) {

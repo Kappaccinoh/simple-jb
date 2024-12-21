@@ -1,4 +1,4 @@
-import { Job, Application, UserProfile } from '@/app/types';
+import { Job, Application, UserProfile } from '@/app/types/index';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 

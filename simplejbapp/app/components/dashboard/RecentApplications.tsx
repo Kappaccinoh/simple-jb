@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchApplications, fetchUserProfile, fetchJobDetails } from '@/app/lib/api';
-import { Application, UserProfile, Job } from '@/app/types';
+import { Application, UserProfile, Job } from '@/app/types/index';
 
 interface ApplicationWithDetails extends Application {
   profile?: UserProfile;

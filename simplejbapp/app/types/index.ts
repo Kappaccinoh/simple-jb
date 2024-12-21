@@ -2,6 +2,8 @@ export interface UserProfile {
   id: number;
   user: number;
   full_name: string;
+  email: string;
+  phone: string;
   current_role: string;
   current_company: string;
   experience_years: number;

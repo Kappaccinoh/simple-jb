@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Badge } from "@/app/components/ui/Badge";
 import { fetchJobs } from '@/app/lib/api';
-import { Job } from '@/app/types';
+import { Job } from '@/app/types/index';
 
 export function ActiveJobListings() {
   const [jobs, setJobs] = useState<Job[]>([]);

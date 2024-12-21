@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Badge } from "@/app/components/ui/Badge";
 import { Navbar } from "@/app/components/navigation/Navbar";
 import { fetchJobs } from '@/app/lib/api';
-import { Job } from '@/app/types';
+import { Job } from '@/app/types/index';
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
