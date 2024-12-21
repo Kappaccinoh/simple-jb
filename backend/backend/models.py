@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.contrib.postgres.fields import ArrayField
 
 class Company(models.Model):
     name = models.CharField(max_length=200)
@@ -44,19 +45,22 @@ class Job(models.Model):
         return f"{self.title} at {self.company.name}"
 
 class Application(models.Model):
-    STATUS_CHOICES = [
+    APPLICATION_STATUS = (
         ('new', 'New'),
         ('reviewed', 'Reviewed'),
         ('interviewed', 'Interviewed'),
-        ('rejected', 'Rejected'),
         ('accepted', 'Accepted'),
-    ]
+        ('rejected', 'Rejected'),
+    )
 
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
-    applicant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
-    skills = models.JSONField()  # Store as list
+    applicant = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=APPLICATION_STATUS, default='new')
+    skills = models.JSONField(default=list)  # Keep as JSONField
     match_score = models.IntegerField(default=0)
+    experience_years = models.IntegerField(default=0)
+    current_role = models.CharField(max_length=100)
+    current_company = models.CharField(max_length=100)
     applied_date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
