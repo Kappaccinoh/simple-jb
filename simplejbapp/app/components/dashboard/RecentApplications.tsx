@@ -115,7 +115,7 @@ export function RecentApplications() {
                   )}
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {application.current_role} at {application.current_company} • {application.experience} years exp.
+                  {application.applicant.current_role} at {application.applicant.current_company} • {application.applicant.experience_years} years exp.
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Applied for {application.job.title} • {application.job.type}

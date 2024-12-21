@@ -49,7 +49,12 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationSerializer
 
     def get_queryset(self):
-        return Application.objects.all().select_related('job', 'applicant')
+        return Application.objects.all().select_related(
+            'job', 
+            'job__company',
+            'applicant',
+            'applicant__userprofile'
+        )
             
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()

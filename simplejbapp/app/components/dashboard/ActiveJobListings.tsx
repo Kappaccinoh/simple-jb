@@ -92,7 +92,7 @@ export function ActiveJobListings() {
                   </Link>
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {job.company.name} • {job.location}
+                  {job.company_name} • {job.location}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Posted {new Date(job.posted_date).toLocaleDateString()}

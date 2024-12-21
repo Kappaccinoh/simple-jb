@@ -48,10 +48,20 @@ class ApplicationSerializer(serializers.ModelSerializer):
         )
 
     def get_applicant(self, obj):
+        profile = UserProfile.objects.get(user=obj.applicant)
         return {
             'first_name': obj.applicant.first_name,
             'last_name': obj.applicant.last_name,
-            'email': obj.applicant.email
+            'email': obj.applicant.email,
+            'current_role': profile.current_role,
+            'current_company': profile.current_company,
+            'experience_years': profile.experience_years,
+            'skills': profile.skills,
+            'portfolio_url': profile.portfolio_url,
+            'github_url': profile.github_url,
+            'linkedin_url': profile.linkedin_url,
+            'bio': profile.bio,
+            'phone': profile.phone
         }
 
 class UserProfileSerializer(serializers.ModelSerializer):
