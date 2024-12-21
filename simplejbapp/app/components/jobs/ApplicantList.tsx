@@ -4,33 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Badge } from "@/app/components/ui/Badge";
 import { TopCandidates } from './TopCandidates';
+import { Application } from '@/app/types';
 
-interface Applicant {
-  id: number;
-  job: {
-    id: number;
-    title: string;
-    type: string;
-  };
-  applicant: {
-    first_name: string;
-    last_name: string;
-    email: string;
-    current_role: string;
-    current_company: string;
-    experience_years: number;
-    skills: string[];
-    portfolio_url?: string;
-    github_url?: string;
-    linkedin_url?: string;
-    phone: string;
-  };
-  status: 'new' | 'reviewed' | 'interviewed' | 'rejected' | 'accepted';
-  match_score: number;
-  applied_date: string;
+interface ApplicantListProps {
+  applicants: Application[];
 }
 
-export function ApplicantList({ applicants }: { applicants: Applicant[] }) {
+export function ApplicantList({ applicants }: ApplicantListProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');

@@ -1,4 +1,13 @@
+import { Job, Application } from '@/app/types';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+
+interface ApiResponse<T> {
+  data?: T;
+  error?: {
+    message: string;
+  };
+}
 
 export async function fetchDashboardStats() {
     const response = await fetch(`${API_BASE_URL}/stats/`);
@@ -6,34 +15,49 @@ export async function fetchDashboardStats() {
     return response.json();
 }
 
-export async function fetchJobs() {
-    const response = await fetch(`${API_BASE_URL}/jobs/`);
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || 'Failed to fetch jobs');
-    }
-    return response.json();
+export async function fetchJobs(): Promise<Job[]> {
+  const response = await fetch(`${API_BASE_URL}/jobs/`);
+  if (!response.ok) {
+    const error = await response.json() as ApiResponse<never>;
+    throw new Error(error.error?.message || 'Failed to fetch jobs');
+  }
+  return response.json() as Promise<Job[]>;
 }
 
-export async function fetchJobDetails(id: string) {
-    const response = await fetch(`${API_BASE_URL}/jobs/${id}/`);
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || 'Failed to fetch job details');
-    }
-    return response.json();
+export async function fetchJobDetails(id: string): Promise<Job> {
+  const response = await fetch(`${API_BASE_URL}/jobs/${id}/`);
+  if (!response.ok) {
+    const error = await response.json() as ApiResponse<never>;
+    throw new Error(error.error?.message || 'Failed to fetch job details');
+  }
+  return response.json() as Promise<Job>;
 }
 
-export async function fetchApplications(jobId?: string) {
-    const url = jobId 
-        ? `${API_BASE_URL}/jobs/${jobId}/applications/` 
-        : `${API_BASE_URL}/applications/`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch applications');
-    return response.json();
+export async function fetchApplications(jobId?: string): Promise<Application[]> {
+  const url = jobId 
+    ? `${API_BASE_URL}/jobs/${jobId}/applications/` 
+    : `${API_BASE_URL}/applications/`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    const error = await response.json() as ApiResponse<never>;
+    throw new Error(error.error?.message || 'Failed to fetch applications');
+  }
+  return response.json() as Promise<Application[]>;
 }
 
-export async function createJob(data: any) {
+interface JobCreateData {
+  title: string;
+  company: number;
+  location: string;
+  type: string;
+  salary: string;
+  description: string;
+  requirements: string[];
+  benefits: string[];
+  status: string;
+}
+
+export async function createJob(data: JobCreateData) {
     const response = await fetch(`${API_BASE_URL}/jobs/`, {
         method: 'POST',
         headers: {

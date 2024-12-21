@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { ApplicantList } from '../ApplicantList'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Application } from '@/app/types'
 
 describe('ApplicantList', () => {
   const mockApplicants = [{

@@ -2,21 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { fetchJobs } from '@/app/lib/api';
+import { Badge } from "@/app/components/ui/Badge";
 import { Navbar } from "@/app/components/navigation/Navbar";
-
-interface Job {
-  id: number;
-  title: string;
-  company: {
-    name: string;
-  };
-  location: string;
-  type: string;
-  salary: string;
-  posted_date: string;
-  status: string;
-}
+import { fetchJobs } from '@/app/lib/api';
+import { Job } from '@/app/types';
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -39,65 +28,84 @@ export default function JobsPage() {
     loadJobs();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Job Listings
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Browse our open positions
-            </p>
-          </div>
-          <Link 
-            href="/jobs/new"
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-          >
-            Post New Job
-          </Link>
-        </div>
-
-        <div className="space-y-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
           {jobs.map((job) => (
             <Link 
               key={job.id}
               href={`/jobs/${job.id}`}
-              className="block bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+              className="block bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="flex justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {job.title}
-                  </h2>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {job.company_name} • {job.location}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {job.type} • {job.salary}
-                  </p>
-                </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Posted: {new Date(job.posted_date).toLocaleDateString()}
+              <div className="p-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      {job.title}
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {job.company.name} • {job.location}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {job.type} • {job.salary}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {job.requirements.slice(0, 3).map((req, index) => (
+                        <Badge key={index} variant="default">
+                          {req}
+                        </Badge>
+                      ))}
+                      {job.requirements.length > 3 && (
+                        <Badge variant="info">
+                          +{job.requirements.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <Badge variant={job.status === 'active' ? 'success' : 'error'}>
+                      {job.status}
+                    </Badge>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(job.posted_date).toLocaleDateString()}
+                    </span>
+                  </div>
                 </div>
               </div>
             </Link>
           ))}
-
-          {jobs.length === 0 && (
-            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-              <p className="text-gray-500 dark:text-gray-400">
-                No jobs available at the moment.
-              </p>
-            </div>
-          )}
         </div>
-      </main>
+      </div>
     </div>
   );
 } 

@@ -4,46 +4,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { fetchJobDetails } from '@/app/lib/api';
 import { Navbar } from "@/app/components/navigation/Navbar";
-import { Badge } from "@/app/components/ui/Badge";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
-import { Metadata } from 'next';
 import { ApplicantList } from "@/app/components/jobs/ApplicantList";
-
-interface Applicant {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  experience: number;
-  currentRole: string;
-  company: string;
-  status: 'new' | 'reviewed' | 'interviewed' | 'rejected' | 'accepted';
-  appliedDate: string;
-  matchScore: number;
-  skills: string[];
-  portfolio?: string;
-  github?: string;
-  linkedin?: string;
-}
-
-interface Job {
-  id: number;
-  title: string;
-  company: {
-    name: string;
-  };
-  location: string;
-  type: string;
-  salary: string;
-  description: string;
-  requirements: string[];
-  benefits: string[];
-  posted_date: string;
-  status: string;
-  applications: any[]; // This will be populated from the API
-}
+import { Job, transformJobApplication } from '@/app/types';
+import { Badge } from '@/app/components/ui/Badge';
 
 export default function JobPage() {
   const params = useParams();
@@ -54,8 +17,14 @@ export default function JobPage() {
   useEffect(() => {
     async function loadJob() {
       try {
+        setLoading(true);
         const data = await fetchJobDetails(params.id as string);
-        setJob(data);
+        // Transform applications to ensure they have company_name
+        const transformedJob = {
+          ...data,
+          applications: data.applications.map(transformJobApplication)
+        };
+        setJob(transformedJob);
       } catch (err) {
         setError('Failed to load job details');
         console.error(err);
@@ -64,7 +33,9 @@ export default function JobPage() {
       }
     }
 
-    loadJob();
+    if (params.id) {
+      loadJob();
+    }
   }, [params.id]);
 
   if (loading) {

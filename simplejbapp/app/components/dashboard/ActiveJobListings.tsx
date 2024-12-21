@@ -1,23 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Badge } from "@/app/components/ui/Badge";
 import { fetchJobs } from '@/app/lib/api';
-
-interface Job {
-  id: number;
-  title: string;
-  company_name: string;
-  location: string;
-  type: string;
-  status: string;
-  posted_date: string;
-  applicants?: {
-    total: number;
-    new: number;
-    reviewed: number;
-  };
-}
+import { Job } from '@/app/types';
 
 export function ActiveJobListings() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -27,9 +14,9 @@ export function ActiveJobListings() {
   useEffect(() => {
     async function loadJobs() {
       try {
+        setLoading(true);
         const data = await fetchJobs();
-        // Filter only active jobs
-        const activeJobs = data.filter((job: Job) => job.status === 'active');
+        const activeJobs = data.filter((job) => job.status === 'active');
         setJobs(activeJobs);
       } catch (err) {
         setError('Failed to load jobs');
@@ -44,22 +31,18 @@ export function ActiveJobListings() {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
-        <h2 className="text-lg font-semibold mb-4">Active Job Listings</h2>
-        <div className="animate-pulse space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
-          ))}
-        </div>
+      <div className="animate-pulse space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+        ))}
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
-        <h2 className="text-lg font-semibold mb-4">Active Job Listings</h2>
-        <p className="text-red-500">Error: {error}</p>
+      <div className="text-red-500 dark:text-red-400">
+        {error}
       </div>
     );
   }
@@ -76,33 +59,57 @@ export function ActiveJobListings() {
         </Link>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {jobs.map((job) => (
-          <Link
+          <Link 
             key={job.id}
             href={`/jobs/${job.id}`}
-            className="block border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="block border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
-                  {job.title}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {job.company_name} • {job.location}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Posted {new Date(job.posted_date).toLocaleDateString()}
-                </p>
-              </div>
-              {job.applicants && (
-                <div className="text-right">
-                  <p className="text-sm font-medium dark:text-white">{job.applicants.total} applicants</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {job.applicants.new} new
-                  </p>
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medium text-gray-900 dark:text-white">
+                    {job.title}
+                  </h3>
+                  <Badge variant={job.status === 'active' ? 'success' : 'error'}>
+                    {job.status}
+                  </Badge>
                 </div>
-              )}
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {job.company.name} • {job.location}
+                </p>
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <span>{job.type}</span>
+                  <span>•</span>
+                  <span>{job.salary}</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {job.requirements.slice(0, 3).map((req, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-full dark:bg-blue-900/30 dark:text-blue-300"
+                    >
+                      {req}
+                    </span>
+                  ))}
+                  {job.requirements.length > 3 && (
+                    <span className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full dark:bg-gray-700 dark:text-gray-300">
+                      +{job.requirements.length - 3} more
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  Posted {new Date(job.posted_date).toLocaleDateString()}
+                </span>
+                {job.applicants && (
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {job.applicants.total} applicants • {job.applicants.new} new
+                  </div>
+                )}
+              </div>
             </div>
           </Link>
         ))}
