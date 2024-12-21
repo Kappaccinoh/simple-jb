@@ -1,3 +1,16 @@
+export interface UserProfile {
+  id: number;
+  user: number;
+  full_name: string;
+  current_role: string;
+  current_company: string;
+  experience_years: number;
+  skills: string[];
+  portfolio_url?: string;
+  github_url?: string;
+  linkedin_url?: string;
+}
+
 export interface Application {
   id: number;
   job: {
@@ -6,19 +19,7 @@ export interface Application {
     type: string;
     company_name: string;
   };
-  applicant: {
-    first_name: string;
-    last_name: string;
-    email: string;
-    current_role: string;
-    current_company: string;
-    experience_years: number;
-    skills: string[];
-    portfolio_url?: string;
-    github_url?: string;
-    linkedin_url?: string;
-    phone: string;
-  };
+  applicant: number;
   status: 'new' | 'reviewed' | 'interviewed' | 'rejected' | 'accepted';
   match_score: number;
   applied_date: string;
@@ -48,19 +49,5 @@ export interface Job {
     total: number;
     new: number;
     reviewed: number;
-  };
-}
-
-export function transformJobApplication(application: Omit<Application, 'job'> & { 
-  job: Omit<Application['job'], 'company_name'> & { 
-    company_name?: string 
-  } 
-}): Application {
-  return {
-    ...application,
-    job: {
-      ...application.job,
-      company_name: application.job.company_name || 'Unknown Company'
-    }
   };
 }

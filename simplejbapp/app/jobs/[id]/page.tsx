@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { fetchJobDetails } from '@/app/lib/api';
 import { Navbar } from "@/app/components/navigation/Navbar";
 import { ApplicantList } from "@/app/components/jobs/ApplicantList";
-import { Job, transformJobApplication } from '@/app/types';
+import { Job } from '@/app/types';
 import { Badge } from '@/app/components/ui/Badge';
 
 export default function JobPage() {

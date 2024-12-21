@@ -1,4 +1,4 @@
-import { Job, Application } from '@/app/types';
+import { Job, Application, UserProfile } from '@/app/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -72,4 +72,13 @@ export async function createJob(data: JobCreateData) {
     }
 
     return response.json();
+} 
+
+export async function fetchUserProfile(userId: number): Promise<UserProfile> {
+  const response = await fetch(`${API_BASE_URL}/profiles/${userId}/`);
+  if (!response.ok) {
+    const error = await response.json() as ApiResponse<never>;
+    throw new Error(error.error?.message || 'Failed to fetch user profile');
+  }
+  return response.json() as Promise<UserProfile>;
 } 

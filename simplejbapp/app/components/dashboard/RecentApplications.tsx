@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchApplications } from '@/app/lib/api';
-import { Application, transformJobApplication } from '@/app/types';
+import { fetchApplications, fetchUserProfile } from '@/app/lib/api';
+import { Application, UserProfile } from '@/app/types';
+
+interface ApplicationWithProfile extends Application {
+  profile?: UserProfile;
+}
 
 export function RecentApplications() {
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<ApplicationWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,12 +19,26 @@ export function RecentApplications() {
       try {
         setLoading(true);
         const data = await fetchApplications();
-        const transformedData = data.map(transformJobApplication);
-        const recentApplications = transformedData
+        
+        // Fetch profiles for each applicant
+        const applicationsWithProfiles = await Promise.all(
+          data.map(async (application) => {
+            try {
+              const profile = await fetchUserProfile(application.applicant);
+              return { ...application, profile };
+            } catch (err) {
+              console.error(`Failed to fetch profile for user ${application.applicant}`);
+              return application;
+            }
+          })
+        );
+
+        const recentApplications = applicationsWithProfiles
           .sort((a, b) => 
             new Date(b.applied_date).getTime() - new Date(a.applied_date).getTime()
           )
           .slice(0, 5);
+
         setApplications(recentApplications);
       } catch (err) {
         setError('Failed to load applications');
@@ -73,7 +91,9 @@ export function RecentApplications() {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-base font-medium text-gray-900 dark:text-white">
-                    {application.applicant.first_name} {application.applicant.last_name}
+                    {
+                      `${application.profile.full_name}`
+                    }
                   </h3>
                   <span className={`px-2 py-0.5 text-xs rounded-full ${
                     application.status === 'new' ? 'bg-blue-100 text-blue-800' :
@@ -86,7 +106,7 @@ export function RecentApplications() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {application.applicant.current_role} at {application.applicant.current_company} • {application.applicant.experience_years} years exp.
+                  {application.profile?.current_role || 'No role'} at {application.profile?.current_company || 'No company'} • {application.profile?.experience_years || 0} years exp.
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Applied for {application.job.title} • {application.job.type}
