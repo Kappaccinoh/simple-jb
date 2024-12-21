@@ -204,7 +204,7 @@ class Command(BaseCommand):
                 "job": created_jobs[0],  # Senior Frontend Developer role
                 "applicant": User.objects.get(username="johndoe"),
                 "status": "interviewed",
-                "experience": 6,
+                "experience_years": 6,
                 "current_role": "Frontend Lead",
                 "current_company": "Tech Corp",
                 "skills": ["React", "TypeScript", "Next.js", "TailwindCSS"],
@@ -214,7 +214,7 @@ class Command(BaseCommand):
                 "job": created_jobs[0],  # Senior Frontend Developer role
                 "applicant": User.objects.get(username="janesmith"),
                 "status": "accepted",
-                "experience": 8,
+                "experience_years": 8,
                 "current_role": "Senior Software Engineer",
                 "current_company": "Big Tech Inc",
                 "skills": ["React", "Node.js", "AWS", "MongoDB"],
@@ -224,7 +224,7 @@ class Command(BaseCommand):
                 "job": created_jobs[0],  # Senior Frontend Developer role
                 "applicant": User.objects.get(username="mikejohnson"),
                 "status": "rejected",
-                "experience": 4,
+                "experience_years": 4,
                 "current_role": "Frontend Developer",
                 "current_company": "Startup Co",
                 "skills": ["React", "Vue.js", "JavaScript", "CSS"],
@@ -234,7 +234,7 @@ class Command(BaseCommand):
                 "job": created_jobs[0],  # Senior Frontend Developer role
                 "applicant": User.objects.get(username="sarahwilliams"),
                 "status": "new",
-                "experience": 5,
+                "experience_years": 5,
                 "current_role": "UI Engineer",
                 "current_company": "Design Studio",
                 "skills": ["React", "Figma", "UI/UX", "SASS"],
@@ -244,7 +244,7 @@ class Command(BaseCommand):
                 "job": created_jobs[0],  # Senior Frontend Developer role
                 "applicant": User.objects.get(username="alexchen"),
                 "status": "reviewed",
-                "experience": 7,
+                "experience_years": 7,
                 "current_role": "Full Stack Developer",
                 "current_company": "Global Tech",
                 "skills": ["React", "Python", "Django", "PostgreSQL"],

@@ -20,12 +20,13 @@ services:
       - "8000:8000"
     environment:
       - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,backend
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/simplejb
+      - DATABASE_URL=postgresql://simplejbdb_user:password@db:5432/simplejbdb
     depends_on:
       - db
-    volumes:
-      - ./backend:/app:delegated
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py seed_data &&
+             python manage.py runserver 0.0.0.0:8000"
 
   db:
     image: postgres:15
@@ -33,9 +34,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=simplejb
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=simplejbdb
+      - POSTGRES_USER=simplejbdb_user
+      - POSTGRES_PASSWORD=password
     ports:
       - "5433:5432"
 

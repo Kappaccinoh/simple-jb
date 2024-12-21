@@ -82,13 +82,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'NAME': os.environ.get('DB_NAME', 'simplejbdb'),
-        'USER': os.environ.get('DB_USER', 'simplejbdb_user'),
-        'PASSWORD': os.environ.get('DB_PASS', 'password'),
+        'NAME': 'simplejbdb',
+        'USER': 'simplejbdb_user',  # Match this with docker-compose
+        'PASSWORD': 'password',  # Match this with docker-compose
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
