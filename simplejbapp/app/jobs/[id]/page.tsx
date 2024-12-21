@@ -18,16 +18,14 @@ export default function JobPage() {
     async function loadJob() {
       try {
         setLoading(true);
+        console.log('Fetching job details for ID:', params.id);
         const data = await fetchJobDetails(params.id as string);
-        // Transform applications to ensure they have company_name
-        const transformedJob = {
-          ...data,
-          applications: data.applications.map(transformJobApplication)
-        };
-        setJob(transformedJob);
+        console.log('Received job data:', data);
+        setJob(data);
+        console.log('Job state set');
       } catch (err) {
+        console.error('Error loading job:', err);
         setError('Failed to load job details');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -82,7 +80,7 @@ export default function JobPage() {
                     {job.title}
                   </h1>
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <span>{job.company.name}</span>
+                    <span>{job.company_name}</span>
                     <span>•</span>
                     <span>{job.location}</span>
                   </div>

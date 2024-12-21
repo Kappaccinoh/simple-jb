@@ -25,12 +25,16 @@ export async function fetchJobs(): Promise<Job[]> {
 }
 
 export async function fetchJobDetails(id: string): Promise<Job> {
+  console.log('Making API request to:', `${API_BASE_URL}/jobs/${id}/`);
   const response = await fetch(`${API_BASE_URL}/jobs/${id}/`);
   if (!response.ok) {
     const error = await response.json() as ApiResponse<never>;
+    console.error('API error:', error);
     throw new Error(error.error?.message || 'Failed to fetch job details');
   }
-  return response.json() as Promise<Job>;
+  const data = await response.json();
+  console.log('API response:', data);
+  return data;
 }
 
 export async function fetchApplications(jobId?: string): Promise<Application[]> {

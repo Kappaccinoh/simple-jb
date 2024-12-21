@@ -193,7 +193,7 @@ export function ApplicantList({ applicants }: ApplicantListProps) {
                 </div>
 
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {application.applicant.skills.map((skill, index) => (
+                  {application.skills?.map((skill, index) => (
                     <span 
                       key={index}
                       className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded dark:bg-gray-700 dark:text-gray-300"
