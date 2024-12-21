@@ -7,9 +7,7 @@ import { fetchJobs } from '@/app/lib/api';
 interface Job {
   id: number;
   title: string;
-  company: {
-    name: string;
-  };
+  company_name: string;
   location: string;
   type: string;
   status: string;
@@ -80,16 +78,15 @@ export function ActiveJobListings() {
 
       <div className="space-y-4">
         {jobs.map((job) => (
-          <div
+          <Link
             key={job.id}
-            className="border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            href={`/jobs/${job.id}`}
+            className="block border dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-medium dark:text-white">
-                  <Link href={`/jobs/${job.id}`} className="hover:text-blue-600 dark:hover:text-blue-400">
-                    {job.title}
-                  </Link>
+                <h3 className="font-medium dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
+                  {job.title}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   {job.company_name} • {job.location}
@@ -107,7 +104,7 @@ export function ActiveJobListings() {
                 </div>
               )}
             </div>
-          </div>
+          </Link>
         ))}
 
         {jobs.length === 0 && (

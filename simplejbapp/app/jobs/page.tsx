@@ -76,7 +76,7 @@ export default function JobsPage() {
                     {job.title}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-300">
-                    {job.company.name} • {job.location}
+                    {job.company_name} • {job.location}
                   </p>
                   <p className="text-gray-600 dark:text-gray-300">
                     {job.type} • {job.salary}
