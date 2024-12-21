@@ -1,29 +1,59 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Badge } from "@/app/components/ui/Badge";
 import { TopCandidates } from './TopCandidates';
-import { Application } from '@/app/types';
+import { Application, UserProfile } from '@/app/types';
+import { fetchUserProfile } from '@/app/lib/api';
+
+interface ApplicationWithProfile extends Application {
+  profile?: UserProfile;
+}
 
 interface ApplicantListProps {
   applicants: Application[];
 }
 
 export function ApplicantList({ applicants }: ApplicantListProps) {
+  const [applicantsWithProfiles, setApplicantsWithProfiles] = useState<ApplicationWithProfile[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('');
 
+  useEffect(() => {
+    async function loadProfiles() {
+      try {
+        const withProfiles = await Promise.all(
+          applicants.map(async (application) => {
+            try {
+              const profile = await fetchUserProfile(application.applicant);
+              return { ...application, profile };
+            } catch (err) {
+              console.error(`Failed to fetch profile for applicant ${application.applicant}`, err);
+              return application;
+            }
+          })
+        );
+        setApplicantsWithProfiles(withProfiles);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProfiles();
+  }, [applicants]);
+
   // Filter and sort applicants
-  const filteredApplicants = applicants
+  const filteredApplicants = applicantsWithProfiles
     .filter(applicant => {
       const matchesSearch = searchTerm === '' || 
-        applicant.applicant.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.applicant.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.applicant.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+        applicant.profile?.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.profile?.current_role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
       
       const matchesStatus = statusFilter === '' || applicant.status === statusFilter;
       
@@ -31,7 +61,7 @@ export function ApplicantList({ applicants }: ApplicantListProps) {
     })
     .sort((a, b) => {
       if (sortBy === 'matchScore') return b.match_score - a.match_score;
-      if (sortBy === 'experience') return b.applicant.experience_years - a.applicant.experience_years;
+      if (sortBy === 'experience') return b.profile?.experience_years - a.profile?.experience_years;
       if (sortBy === 'appliedDate') return new Date(b.applied_date).getTime() - new Date(a.applied_date).getTime();
       return 0;
     });
@@ -45,7 +75,7 @@ export function ApplicantList({ applicants }: ApplicantListProps) {
 
   return (
     <div className="space-y-6">
-      <TopCandidates applicants={applicants} />
+      <TopCandidates applicants={applicantsWithProfiles} />
 
       <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
         All Applicants
@@ -171,7 +201,7 @@ export function ApplicantList({ applicants }: ApplicantListProps) {
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <h3 className="text-base font-medium text-gray-900 dark:text-white">
-                    {application.applicant.first_name} {application.applicant.last_name}
+                    {application.profile?.full_name || `Applicant ${application.applicant}`}
                   </h3>
                   {application.match_score >= 90 && (
                     <Badge variant="success">
@@ -189,7 +219,7 @@ export function ApplicantList({ applicants }: ApplicantListProps) {
                 </div>
 
                 <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                  {application.applicant.current_role} at {application.applicant.current_company} • {application.applicant.experience_years} years exp.
+                  {application.profile?.current_role || 'No role'} at {application.profile?.current_company || 'No company'} • {application.profile?.experience_years || 0} years exp.
                 </div>
 
                 <div className="mt-2 flex flex-wrap gap-2">
