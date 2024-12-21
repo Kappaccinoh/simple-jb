@@ -55,14 +55,8 @@ class Application(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
     applicant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
-    experience = models.IntegerField()
-    current_role = models.CharField(max_length=200)
-    current_company = models.CharField(max_length=200)
     skills = models.JSONField()  # Store as list
-    portfolio_url = models.URLField(blank=True)
-    github_url = models.URLField(blank=True)
-    linkedin_url = models.URLField(blank=True)
-    match_score = models.IntegerField(default=0)  # AI-calculated match score
+    match_score = models.IntegerField(default=0)
     applied_date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

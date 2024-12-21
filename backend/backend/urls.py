@@ -1,29 +1,23 @@
-"""
-URL configuration for backend project.
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from .views import (
+    CompanyViewSet, JobViewSet, ApplicationViewSet,
+    UserProfileViewSet, JobViewViewSet
+)
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path
-from rest_framework import routers
-from . import views
-
-router = routers.DefaultRouter()
-router.register(r'jobs', views.JobViewSet, basename='job')
-router.register(r'applications', views.ApplicationViewSet, basename='application')
+router = DefaultRouter()
+router.register(r'companies', CompanyViewSet)
+router.register(r'jobs', JobViewSet)
+router.register(r'applications', ApplicationViewSet, basename='application')
+router.register(r'profiles', UserProfileViewSet, basename='profile')
+router.register(r'job-views', JobViewViewSet)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/stats/', views.dashboard_stats, name='dashboard-stats'),
-] + router.urls
+    path('api/', include(router.urls)),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+]

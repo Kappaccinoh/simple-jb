@@ -1,9 +1,13 @@
 'use client';
 
+import { useState } from 'react';
+import { createJob } from '@/app/lib/api';
+import { useRouter } from 'next/navigation';
 import { Navbar } from "@/app/components/navigation/Navbar";
-import { useState } from "react";
 
 export default function NewJobPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const [jobData, setJobData] = useState({
     title: '',
     location: '',
@@ -15,9 +19,33 @@ export default function NewJobPage() {
     benefits: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(jobData);
+    setLoading(true);
+
+    try {
+      const formattedData = {
+        ...jobData,
+        company: 1, // ID of TechFlow Solutions
+        status: 'active',
+        requirements: jobData.requirements.split('\n').filter(req => req.trim()),
+        benefits: jobData.benefits.split('\n').filter(benefit => benefit.trim()),
+        posted_date: new Date().toISOString()
+      };
+
+      console.log('Sending data:', formattedData); // Debug log
+
+      const result = await createJob(formattedData);
+      console.log('Response:', result); // Debug log
+      
+      router.push('/jobs');
+    } catch (error) {
+      console.error('Failed to create job:', error);
+      // Add user feedback here
+      alert('Failed to create job. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -169,9 +197,10 @@ export default function NewJobPage() {
             </button>
             <button
               type="submit"
-              className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
+              disabled={loading}
             >
-              Publish Job
+              {loading ? 'Publishing...' : 'Publish Job'}
             </button>
           </div>
         </form>

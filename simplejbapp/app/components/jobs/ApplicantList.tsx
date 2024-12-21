@@ -7,26 +7,30 @@ import { TopCandidates } from './TopCandidates';
 
 interface Applicant {
   id: number;
-  name: string;
-  email: string;
-  phone: string;
-  experience: number;
-  currentRole: string;
-  company: string;
+  job: {
+    id: number;
+    title: string;
+    type: string;
+  };
+  applicant: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    current_role: string;
+    current_company: string;
+    experience_years: number;
+    skills: string[];
+    portfolio_url?: string;
+    github_url?: string;
+    linkedin_url?: string;
+    phone: string;
+  };
   status: 'new' | 'reviewed' | 'interviewed' | 'rejected' | 'accepted';
-  appliedDate: string;
-  matchScore: number;
-  skills: string[];
-  portfolio?: string;
-  github?: string;
-  linkedin?: string;
+  match_score: number;
+  applied_date: string;
 }
 
-interface ApplicantListProps {
-  applicants: Applicant[];
-}
-
-export function ApplicantList({ applicants }: ApplicantListProps) {
+export function ApplicantList({ applicants }: { applicants: Applicant[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,18 +41,18 @@ export function ApplicantList({ applicants }: ApplicantListProps) {
   const filteredApplicants = applicants
     .filter(applicant => {
       const matchesSearch = searchTerm === '' || 
-        applicant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+        applicant.applicant.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.applicant.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.applicant.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
       
       const matchesStatus = statusFilter === '' || applicant.status === statusFilter;
       
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
-      if (sortBy === 'matchScore') return b.matchScore - a.matchScore;
-      if (sortBy === 'experience') return b.experience - a.experience;
-      if (sortBy === 'appliedDate') return new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime();
+      if (sortBy === 'matchScore') return b.match_score - a.match_score;
+      if (sortBy === 'experience') return b.applicant.experience_years - a.applicant.experience_years;
+      if (sortBy === 'appliedDate') return new Date(b.applied_date).getTime() - new Date(a.applied_date).getTime();
       return 0;
     });
 
@@ -178,38 +182,38 @@ export function ApplicantList({ applicants }: ApplicantListProps) {
 
       {/* Applicant Cards */}
       <div className="space-y-4">
-        {currentApplicants.map((applicant) => (
+        {currentApplicants.map((application) => (
           <div 
-            key={applicant.id}
+            key={application.id}
             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <h3 className="text-base font-medium text-gray-900 dark:text-white">
-                    {applicant.name}
+                    {application.applicant.first_name} {application.applicant.last_name}
                   </h3>
-                  {applicant.matchScore >= 90 && (
+                  {application.match_score >= 90 && (
                     <Badge variant="success">
-                      Top Match {applicant.matchScore}%
+                      Top Match {application.match_score}%
                     </Badge>
                   )}
                   <Badge variant={
-                    applicant.status === 'new' ? 'info' :
-                    applicant.status === 'reviewed' ? 'warning' :
-                    applicant.status === 'interviewed' ? 'default' :
-                    applicant.status === 'accepted' ? 'success' : 'error'
+                    application.status === 'new' ? 'info' :
+                    application.status === 'reviewed' ? 'warning' :
+                    application.status === 'interviewed' ? 'default' :
+                    application.status === 'accepted' ? 'success' : 'error'
                   }>
-                    {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
+                    {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
                   </Badge>
                 </div>
 
                 <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                  {applicant.currentRole} at {applicant.company} • {applicant.experience} years exp.
+                  {application.applicant.current_role} at {application.applicant.current_company} • {application.applicant.experience_years} years exp.
                 </div>
 
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {applicant.skills.map((skill, index) => (
+                  {application.applicant.skills.map((skill, index) => (
                     <span 
                       key={index}
                       className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded dark:bg-gray-700 dark:text-gray-300"
@@ -221,38 +225,38 @@ export function ApplicantList({ applicants }: ApplicantListProps) {
 
                 <div className="mt-3 flex items-center gap-4 text-sm">
                   <Link 
-                    href={`mailto:${applicant.email}`}
+                    href={`mailto:${application.applicant.email}`}
                     className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                   >
-                    {applicant.email}
+                    {application.applicant.email}
                   </Link>
                   <span className="text-gray-600 dark:text-gray-400">
-                    {applicant.phone}
+                    {application.applicant.phone}
                   </span>
                 </div>
 
                 <div className="mt-2 flex gap-3">
-                  {applicant.portfolio && (
+                  {application.applicant.portfolio_url && (
                     <Link 
-                      href={applicant.portfolio}
+                      href={application.applicant.portfolio_url}
                       className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
                       target="_blank"
                     >
                       Portfolio ↗
                     </Link>
                   )}
-                  {applicant.github && (
+                  {application.applicant.github_url && (
                     <Link 
-                      href={applicant.github}
+                      href={application.applicant.github_url}
                       className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
                       target="_blank"
                     >
                       GitHub ↗
                     </Link>
                   )}
-                  {applicant.linkedin && (
+                  {application.applicant.linkedin_url && (
                     <Link 
-                      href={applicant.linkedin}
+                      href={application.applicant.linkedin_url}
                       className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
                       target="_blank"
                     >

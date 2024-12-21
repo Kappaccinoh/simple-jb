@@ -1,48 +1,51 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Navbar } from "@/app/components/navigation/Navbar";
 import { Badge } from "@/app/components/ui/Badge";
 import Link from "next/link";
+import { fetchApplications } from '@/app/lib/api';
 
 interface Application {
   id: number;
-  name: string;
-  email: string;
-  applied: string;
-  status: 'new' | 'reviewed' | 'interviewed' | 'rejected' | 'accepted';
   job: {
     id: number;
     title: string;
     type: string;
+    company_name: string;
   };
+  applicant: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    current_role: string;
+    current_company: string;
+  };
+  status: 'new' | 'reviewed' | 'interviewed' | 'rejected' | 'accepted';
+  match_score: number;
+  applied_date: string;
 }
 
 export default function ApplicationsPage() {
-  const applications: Application[] = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      applied: "2024-02-15",
-      status: "new",
-      job: {
-        id: 1,
-        title: "Senior Frontend Developer",
-        type: "Full-time"
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadApplications() {
+      try {
+        const data = await fetchApplications();
+        setApplications(data);
+      } catch (err) {
+        setError('Failed to load applications');
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@example.com",
-      applied: "2024-02-14",
-      status: "reviewed",
-      job: {
-        id: 2,
-        title: "Backend Engineer",
-        type: "Full-time"
-      }
-    },
-    // Add more sample applications...
-  ];
+    }
+
+    loadApplications();
+  }, []);
 
   const getStatusBadge = (status: Application['status']) => {
     const variants = {
@@ -59,6 +62,34 @@ export default function ApplicationsPage() {
       </Badge>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse space-y-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
+            <p className="text-red-600 dark:text-red-200">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -94,8 +125,13 @@ export default function ApplicationsPage() {
                         <div className="mt-2 flex items-center gap-3">
                           <Badge variant="default">{application.job.type}</Badge>
                           <span className="text-sm text-gray-500 dark:text-gray-400">
-                            Applied {application.applied}
+                            Applied {new Date(application.applied_date).toLocaleDateString()}
                           </span>
+                          {application.match_score >= 90 && (
+                            <Badge variant="success">
+                              Match Score {application.match_score}%
+                            </Badge>
+                          )}
                         </div>
                       </div>
 
@@ -103,10 +139,10 @@ export default function ApplicationsPage() {
                         <div className="flex items-center gap-4">
                           <div className="min-w-0">
                             <div className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
-                              {application.name}
+                              {application.applicant.first_name} {application.applicant.last_name}
                             </div>
                             <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                              {application.email}
+                              {application.applicant.email}
                             </div>
                           </div>
                           {getStatusBadge(application.status)}
@@ -125,6 +161,12 @@ export default function ApplicationsPage() {
                   </div>
                 </div>
               ))}
+
+              {applications.length === 0 && (
+                <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+                  No applications found
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -37,18 +37,32 @@ class JobSerializer(serializers.ModelSerializer):
         }
 
 class ApplicationSerializer(serializers.ModelSerializer):
-    applicant_name = serializers.CharField(source='applicant.get_full_name', read_only=True)
-    job_title = serializers.CharField(source='job.title', read_only=True)
+    applicant = serializers.SerializerMethodField()
+    job = JobSerializer()
 
     class Meta:
         model = Application
         fields = (
-            'id', 'job', 'job_title', 'applicant', 'applicant_name',
-            'status', 'experience', 'current_role', 'current_company',
-            'skills', 'portfolio_url', 'github_url', 'linkedin_url',
-            'match_score', 'applied_date', 'updated_at'
+            'id', 'job', 'applicant', 'status', 'match_score', 
+            'applied_date', 'updated_at'
         )
-        read_only_fields = ('match_score', 'applied_date', 'updated_at')
+
+    def get_applicant(self, obj):
+        profile = UserProfile.objects.get(user=obj.applicant)
+        return {
+            'first_name': obj.applicant.first_name,
+            'last_name': obj.applicant.last_name,
+            'email': obj.applicant.email,
+            'current_role': profile.current_role,
+            'current_company': profile.current_company,
+            'experience_years': profile.experience_years,
+            'skills': profile.skills,
+            'portfolio_url': profile.portfolio_url,
+            'github_url': profile.github_url,
+            'linkedin_url': profile.linkedin_url,
+            'bio': profile.bio,
+            'phone': profile.phone
+        }
 
 class UserProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(source='user.get_full_name', read_only=True)
@@ -72,19 +86,15 @@ class JobViewSerializer(serializers.ModelSerializer):
 
 # Nested serializers for detailed views
 class JobDetailSerializer(JobSerializer):
-    applications = serializers.SerializerMethodField()
+    applications = ApplicationSerializer(many=True, read_only=True)
     company = CompanySerializer(read_only=True)
 
     class Meta(JobSerializer.Meta):
         fields = JobSerializer.Meta.fields + ('applications',)
-
-    def get_applications(self, obj):
-        applications = obj.applications.all()
-        return ApplicationSerializer(applications, many=True).data
 
 class ApplicationDetailSerializer(ApplicationSerializer):
     job = JobSerializer(read_only=True)
     applicant = UserSerializer(read_only=True)
 
     class Meta(ApplicationSerializer.Meta):
-        fields = ApplicationSerializer.Meta.fields + ('job', 'applicant') 
+        fields = ApplicationSerializer.Meta.fields + ('job', 'applicant')
