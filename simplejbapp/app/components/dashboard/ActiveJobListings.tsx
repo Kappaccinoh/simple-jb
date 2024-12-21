@@ -77,7 +77,7 @@ export function ActiveJobListings() {
                   </Badge>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {job.company.name} • {job.location}
+                  {job.company_name} • {job.location}
                 </p>
                 <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                   <span>{job.type}</span>

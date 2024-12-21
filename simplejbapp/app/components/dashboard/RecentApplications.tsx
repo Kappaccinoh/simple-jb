@@ -2,15 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchApplications, fetchUserProfile } from '@/app/lib/api';
-import { Application, UserProfile } from '@/app/types';
+import { fetchApplications, fetchUserProfile, fetchJobDetails } from '@/app/lib/api';
+import { Application, UserProfile, Job } from '@/app/types';
 
-interface ApplicationWithProfile extends Application {
+interface ApplicationWithDetails extends Application {
   profile?: UserProfile;
+  jobDetails?: Job;
 }
 
 export function RecentApplications() {
-  const [applications, setApplications] = useState<ApplicationWithProfile[]>([]);
+  const [applications, setApplications] = useState<ApplicationWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,21 +20,28 @@ export function RecentApplications() {
       try {
         setLoading(true);
         const data = await fetchApplications();
-        
-        // Fetch profiles for each applicant
-        const applicationsWithProfiles = await Promise.all(
+        console.log('Raw applications:', data);
+
+        const applicationsWithDetails = await Promise.all(
           data.map(async (application) => {
             try {
-              const profile = await fetchUserProfile(application.applicant);
-              return { ...application, profile };
+              const [profile, jobDetails] = await Promise.all([
+                fetchUserProfile(application.applicant),
+                fetchJobDetails(application.job.toString())
+              ]);
+              return { 
+                ...application, 
+                profile,
+                jobDetails
+              };
             } catch (err) {
-              console.error(`Failed to fetch profile for user ${application.applicant}`);
+              console.error(`Failed to fetch details for application ${application.id}`, err);
               return application;
             }
           })
         );
 
-        const recentApplications = applicationsWithProfiles
+        const recentApplications = applicationsWithDetails
           .sort((a, b) => 
             new Date(b.applied_date).getTime() - new Date(a.applied_date).getTime()
           )
@@ -41,8 +49,8 @@ export function RecentApplications() {
 
         setApplications(recentApplications);
       } catch (err) {
+        console.error('Failed to load applications:', err);
         setError('Failed to load applications');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -91,9 +99,7 @@ export function RecentApplications() {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-base font-medium text-gray-900 dark:text-white">
-                    {
-                      `${application.profile.full_name}`
-                    }
+                    {application.profile?.full_name || `User ${application.applicant}`}
                   </h3>
                   <span className={`px-2 py-0.5 text-xs rounded-full ${
                     application.status === 'new' ? 'bg-blue-100 text-blue-800' :
@@ -109,7 +115,7 @@ export function RecentApplications() {
                   {application.profile?.current_role || 'No role'} at {application.profile?.current_company || 'No company'} • {application.profile?.experience_years || 0} years exp.
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Applied for {application.job.title} • {application.job.type}
+                  Applied for {application.jobDetails?.title || 'Unknown Job'} • {application.jobDetails?.type || 'N/A'}
                 </p>
               </div>
               <Link
