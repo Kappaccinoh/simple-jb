@@ -14,11 +14,11 @@ class Company(models.Model):
         return self.name
 
 class Job(models.Model):
-    STATUS_CHOICES = [
+    JOB_STATUS = (
         ('active', 'Active'),
-        ('draft', 'Draft'),
         ('closed', 'Closed'),
-    ]
+        ('draft', 'Draft'),
+    )
     TYPE_CHOICES = [
         ('full-time', 'Full Time'),
         ('part-time', 'Part Time'),
@@ -34,7 +34,7 @@ class Job(models.Model):
     description = models.TextField()
     requirements = models.JSONField()  # Store as list
     benefits = models.JSONField()      # Store as list
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    status = models.CharField(max_length=20, choices=JOB_STATUS, default='active')
     posted_date = models.DateTimeField(default=timezone.now)
     views = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

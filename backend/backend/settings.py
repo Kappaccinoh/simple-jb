@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,11 +82,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'simplejbdb',
-        'USER': 'simplejbdb_user',     # New username here
-        'PASSWORD': 'password', # New password here
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'NAME': os.environ.get('DB_NAME', 'simplejbdb'),
+        'USER': os.environ.get('DB_USER', 'simplejbdb_user'),
+        'PASSWORD': os.environ.get('DB_PASS', 'password'),
     }
 }
 
@@ -156,3 +157,18 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
 }
+
+# Test settings
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+# For pytest-django
+DJANGO_SETTINGS_MODULE = 'backend.settings'
+
+# Test database settings
+if 'test' in sys.argv or 'pytest' in sys.modules:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }

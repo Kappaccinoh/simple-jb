@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: backend
+Version: 0.0.0
+Requires-Dist: django<4.3.0,>=4.2.0
+Requires-Dist: djangorestframework<3.15.0,>=3.14.0
+Requires-Dist: psycopg2-binary<3.0.0,>=2.9.9
+Requires-Dist: django-cors-headers<4.4.0,>=4.3.1
